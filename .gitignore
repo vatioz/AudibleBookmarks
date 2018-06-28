@@ -18,6 +18,16 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# C# build folders
+bin/
+obj/
+
+# Visual Studio
+.vs/
+
+# NuGet
+packages/
+
 # =========================
 # Operating System Files
 # =========================

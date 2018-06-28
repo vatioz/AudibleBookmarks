@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace AudibleLibraryParser
+namespace AudibleBookmarks
 {
     public class IsDownloadedToBackgroundConverter: IValueConverter
     {

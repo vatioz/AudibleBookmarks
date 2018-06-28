@@ -1,17 +1,17 @@
-﻿<Window x:Class="AudibleLibraryParser.MainWindow"
+﻿<Window x:Class="AudibleBookmarks.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AudibleLibraryParser"
+        xmlns:audibleBookmarks="clr-namespace:AudibleBookmarks"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Audible Bookmarks" Height="450" Width="800">
     <Window.DataContext>
-        <local:MainViewModel x:Name="MainViewModel" />
+        <audibleBookmarks:MainViewModel x:Name="MainViewModel" />
     </Window.DataContext>
     <Window.Resources>
-        <local:IsDownloadedToBackgroundConverter x:Key="IsDownloadedToBackgroundConverter"  />
-        <local:BookmarkStateConverter x:Key="BookmarkStateConverter"  />
+        <audibleBookmarks:IsDownloadedToBackgroundConverter x:Key="IsDownloadedToBackgroundConverter"  />
+        <audibleBookmarks:BookmarkStateConverter x:Key="BookmarkStateConverter"  />
     </Window.Resources>
     <Grid>
         <Button Content="Load Audible DB" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Padding="10 5" Command="{Binding LoadAudibleLibrary}"/>

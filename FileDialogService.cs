@@ -3,7 +3,7 @@ using System.IO;
 using System.Windows.Forms;
 using TinyMessenger;
 
-namespace AudibleLibraryParser
+namespace AudibleBookmarks
 {
     class FileDialogService
     {

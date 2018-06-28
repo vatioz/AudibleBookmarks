@@ -7,7 +7,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using TinyMessenger;
 
-namespace AudibleLibraryParser
+namespace AudibleBookmarks
 {
     public class MainViewModel
     {
