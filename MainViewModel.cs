@@ -2,8 +2,11 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data.SQLite;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Data;
+using System.Windows.Forms;
 using System.Windows.Input;
 using TinyMessenger;
 
@@ -14,11 +17,11 @@ namespace AudibleBookmarks
         // tODO Add counts - total bookmarks in book, empty, notes only, titles only
         // TODO Add inteligent DB seek (auto load)
         // TODO Extract time for bookmarks (android style - per chapter)
-        // TODO Export bookmarks (to txt)
+        // TODO Add some sort of template for export
         // TODO Add option to export without empties
         // TODO make UI resizable
         // TODO think about how to display notes (ellipsis..., max lines, max height, max width?)
-
+        // TODO add logic to CanExportExecute
 
 
         private string _pathToLibrary;
@@ -107,6 +110,41 @@ namespace AudibleBookmarks
         }
 
         public ICommand LoadAudibleLibrary { get { return new RelayCommand(CanLoadAudibleLibraryExecute, LoadAudibleLibraryExecute); } }
+        public ICommand Export { get { return new RelayCommand(CanExportExecute, ExportExecute); } }
+
+        private void ExportExecute()
+        {
+            var sb = new StringBuilder();
+            foreach (var bookmark in Bookmarks)
+            {
+                if(bookmark.IsEmptyBookmark)
+                    continue;
+
+                sb.AppendLine(bookmark.Chapter);
+                if(!string.IsNullOrWhiteSpace(bookmark.Title))
+                    sb.AppendLine(bookmark.Title);
+                if (!string.IsNullOrWhiteSpace(bookmark.Note))
+                    sb.AppendLine(bookmark.Note);
+            }
+
+            var dlg = new SaveFileDialog();
+            dlg.Filter = "Text Files (*.txt)|*.txt";
+            dlg.DefaultExt = "txt";
+            dlg.AddExtension = true;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                var stream = dlg.OpenFile();
+                var sw = new StreamWriter(stream);
+                sw.Write(sb.ToString());
+                sw.Flush();
+                sw.Close();
+            }
+        }
+
+        private bool CanExportExecute()
+        {
+            return true;
+        }
 
         public MainViewModel()
         {

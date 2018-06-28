@@ -41,6 +41,7 @@
         </ListBox>
         <TextBox HorizontalAlignment="Left" Height="23" Margin="10,43,0,0" TextWrapping="Wrap" Text="{Binding BookFilterValue, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="120"/>
         <TextBox HorizontalAlignment="Left" Height="23" Margin="309,43,0,0" TextWrapping="Wrap" Text="{Binding BookmarkFilterValue, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="120"/>
+        <Button Content="Export" HorizontalAlignment="Left" Margin="707,43,0,0" VerticalAlignment="Top" Width="75" Command="{Binding Export}"/>
 
     </Grid>
 </Window>
