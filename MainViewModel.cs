@@ -22,6 +22,7 @@ namespace AudibleBookmarks
         // TODO make UI resizable
         // TODO think about how to display notes (ellipsis..., max lines, max height, max width?)
         // TODO add logic to CanExportExecute
+        // TODO write README.MD for github
 
 
         private string _pathToLibrary;
