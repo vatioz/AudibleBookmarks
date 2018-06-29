@@ -26,6 +26,13 @@ This is small WPF application capable of loading audible SQLite database and the
 * Do this for every book you wish to export bookmarks from
 * Books as well as bookmarks can be filtered by simply entering text into filtering text boxes
 * Filtering does not affect exporting
+* You can change how bookmarks are exported by editing text template - file `BookmarkTemplate.txt`. This template will be used for each bookmark.
+  * In the template you can use predefined substitutes (all related to a bookmark)
+    * `{Title}` - bookmark title
+    * `{Note}` - bookmark note
+    * `{ChapterTitle}` - title of the chapter of the bookmark
+    * `{PositionChapter}` - time from the begining of the chapter
+    * `{PositionOverall}` - time from the begining of the book
 
 ## Considerations
 As I was testing this app, I came across issues with syncing between my Android Audible app and Windows 10 app. I primarily enter notes through my Android phone. Windows 10 Audible app was always seeing all the bookmarks, but some of them are often empty (no bookmark title nor note) although there definitely is a note on my phone.  
