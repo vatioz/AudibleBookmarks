@@ -6,7 +6,7 @@
         xmlns:audibleBookmarks="clr-namespace:AudibleBookmarks"
         mc:Ignorable="d"
         Title="Audible Bookmarks" Height="450" Width="800">
-    
+
     <Window.DataContext>
         <audibleBookmarks:MainViewModel x:Name="MainViewModel" />
     </Window.DataContext>
@@ -14,26 +14,129 @@
         <audibleBookmarks:IsDownloadedToBackgroundConverter x:Key="IsDownloadedToBackgroundConverter"  />
         <audibleBookmarks:BookmarkStateConverter x:Key="BookmarkStateConverter"  />
     </Window.Resources>
-    
+
     <Grid>
-        <Button Content="Load Audible DB" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Padding="10 5" Command="{Binding LoadAudibleLibrary}"/>
-        <ListBox HorizontalAlignment="Left" Height="338" Margin="10,71,0,0" VerticalAlignment="Top" Width="294" SelectedItem="{Binding SelectedBook}" ItemsSource="{Binding FilterableBooks}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="2*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"  />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Button Grid.Column="0" Grid.Row="0" 
+                Content="Load Audible DB"
+                VerticalAlignment="Top" 
+                HorizontalAlignment="Left" 
+                Margin="10,10,0,0"
+                Padding="10 5" 
+                Command="{Binding LoadAudibleLibrary}"/>
+        <Grid Grid.Column="0" Grid.Row="1" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Grid.Row="0"
+                Text="Fiter books:"
+                       VerticalAlignment="Center"
+                       Margin="10"
+                       />
+            <TextBox Grid.Column="1" Grid.Row="0" 
+                     Height="30" 
+                     HorizontalAlignment="Stretch"
+                     Text="{Binding BookFilterValue, UpdateSourceTrigger=PropertyChanged}" 
+                     />
+        </Grid>
+        <ListBox Grid.Column="0" Grid.Row="2" 
+                 Name="lbBooks"
+                 Margin="5" 
+                 ScrollViewer.CanContentScroll="False"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 SelectedItem="{Binding SelectedBook}" 
+                 ItemsSource="{Binding FilterableBooks}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Background="{Binding IsDownloaded, Converter={StaticResource IsDownloadedToBackgroundConverter}}">
-                        <TextBlock Text="{Binding Title}" />
-                        <TextBlock Text="{Binding Author}" />
-                        <TextBlock Text="{Binding Narrator}" />
-                        <TextBlock Text="{Binding Length,StringFormat=hh\\:mm}" />
-                        <Separator  />
-                    </StackPanel>
+
+                    <StackPanel Width="{Binding ElementName=lbBooks, Path=ActualWidth}"
+                        Background="{Binding IsDownloaded, Converter={StaticResource IsDownloadedToBackgroundConverter}}">
+                            <TextBlock Text="{Binding Title}" />
+                            <TextBlock Text="{Binding Author}" />
+                            <TextBlock Text="{Binding Narrator}" />
+                            <TextBlock Text="{Binding Length,StringFormat=hh\\:mm}" />
+                            <Separator  />
+                        </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <ListBox HorizontalAlignment="Left" Height="338" Margin="309,71,0,0" VerticalAlignment="Top" Width="473" ItemsSource="{Binding FilterableBookmarks}">
+
+        <TextBlock Grid.Column="0" Grid.Row="3" 
+                   VerticalAlignment="Center"
+                   Margin="10">
+            <Run Text="Book stats: " FontWeight="Bold" />
+            <Run Text="Total: " />
+            <Run Text="{Binding TotalBookCount, Mode=OneWay}" />
+            <Run Text="| Downloaded: " />
+            <Run Text="{Binding DownloadedBookCount, Mode=OneWay}" />
+
+        </TextBlock>
+
+
+        <GridSplitter  Grid.Column="1" Grid.Row="0" 
+                       Grid.RowSpan="4" 
+                       ResizeDirection="Columns"
+                       ResizeBehavior="PreviousAndNext" 
+                       Width="5" />
+
+
+        <TextBlock Grid.Column="2" Grid.Row="0"
+                   VerticalAlignment="Center"
+                   Margin="10 0"
+                   FontSize="20"
+                   FontWeight="Bold"
+                   TextWrapping="Wrap"
+            Text="{Binding SelectedBook.Title}" />
+
+
+        <Grid Grid.Column="2" Grid.Row="1" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Grid.Row="0"
+                       Text="Fiter bookmarks:"
+                       VerticalAlignment="Center"
+                       Margin="10"/>
+
+            <TextBox  Grid.Column="1" Grid.Row="0" 
+                      HorizontalAlignment="Stretch" 
+                      Height="30"
+                      Margin="0 0 40 0"
+                      Text="{Binding BookmarkFilterValue, UpdateSourceTrigger=PropertyChanged}" 
+                  />
+
+            <Button Grid.Column="2" Grid.Row="0" 
+                    Content="Export bookmarks"
+                    Margin="5"
+                    Padding="10,5" 
+                    Command="{Binding Export}"/>
+        </Grid>
+
+        <ListBox Grid.Column="2" Grid.Row="2"
+                 Name="lbBookmarks"
+                 Margin="5" 
+                 ScrollViewer.CanContentScroll="False"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ItemsSource="{Binding FilterableBookmarks}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel MinWidth="200" Background="{Binding IsEmptyBookmark, Converter={StaticResource BookmarkStateConverter}}">
+                    <StackPanel Width="{Binding ElementName=lbBookmarks, Path=ActualWidth}" Background="{Binding IsEmptyBookmark, Converter={StaticResource BookmarkStateConverter}}">
                         <TextBlock>
                             <Run Text="{Binding Chapter.Title}" FontWeight="Bold" FontSize="14"/>
                             <Run Text=" / " FontWeight="Bold"/>
@@ -43,7 +146,7 @@
                             <Run Text="(" />
                             <Run Text="{Binding PositionOverall, Mode=OneTime, StringFormat=hh\\:mm\\:ss}" FontStyle="Italic" />
                             <Run Text=")" />
-                        </TextBlock> 
+                        </TextBlock>
                         <TextBlock Text="{Binding Title}" />
                         <TextBlock Text="{Binding Note}" FontStyle="Italic" />
                         <Separator  />
@@ -51,10 +154,24 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="10,43,0,0" TextWrapping="Wrap" Text="{Binding BookFilterValue, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="120"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="309,43,0,0" TextWrapping="Wrap" Text="{Binding BookmarkFilterValue, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="120"/>
-        <Button Content="Export" HorizontalAlignment="Left" Margin="707,43,0,0" VerticalAlignment="Top" Width="75" Command="{Binding Export}"/>
+
+        <TextBlock Grid.Column="2" Grid.Row="3" 
+                   VerticalAlignment="Center"
+                   Margin="10">
+            <Run Text="Bookmarks stats: " FontWeight="Bold" />
+            <Run Text="Total: " />
+            <Run Text="{Binding TotalBookmarkCount, Mode=OneWay}" />
+            <Run Text="| Empty: " />
+            <Run Text="{Binding EmptyBookmarkCount, Mode=OneWay}" />
+            <Run Text="| Only title: " />
+            <Run Text="{Binding OnlyTitleBookmarkCount, Mode=OneWay}" />
+            <Run Text="| Only note: " />
+            <Run Text="{Binding OnlyNoteBookmarkCount, Mode=OneWay}" />
+
+        </TextBlock>
 
     </Grid>
 </Window>
+
+
 

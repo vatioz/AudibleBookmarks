@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -15,17 +16,17 @@ using TinyMessenger;
 
 namespace AudibleBookmarks
 {
-    public class MainViewModel
+    public class MainViewModel : INotifyPropertyChanged
     {
-        // tODO Add counts - total bookmarks in book, empty, notes only, titles only
         // TODO Add inteligent DB seek (auto load)
         // TODO Add some sort of template for export
         // TODO Add option to export without empties
-        // TODO make UI resizable
         // TODO think about how to display notes (ellipsis..., max lines, max height, max width?)
-        // TODO add logic to CanExportExecute
         // TODO write README.MD for github
         // TODO look why there are multiple books for courses
+        // TODO make code more aware of various exception-states (add try catches)
+        // TODO do refactor
+
 
         // TODO make template of app of this sort with all the necessary starting points - TinyMessenger, RelayCommand, FileDialogService, MainViewModel, ListBox
 
@@ -63,13 +64,30 @@ namespace AudibleBookmarks
                 _selectedBook = value;
                 LoadChapters(_selectedBook);
                 LoadBookmarks(_selectedBook);
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(TotalBookmarkCount));
+                OnPropertyChanged(nameof(EmptyBookmarkCount));
+                OnPropertyChanged(nameof(OnlyTitleBookmarkCount));
+                OnPropertyChanged(nameof(OnlyNoteBookmarkCount));
             }
         }
+
+        public int TotalBookCount => Books.Count;
+
+        public int DownloadedBookCount => Books.Count(b => b.IsDownloaded);
+
+
+
+        public int TotalBookmarkCount => Bookmarks.Count;
+        public int EmptyBookmarkCount => Bookmarks.Count(bm => bm.IsEmptyBookmark);
+        public int OnlyTitleBookmarkCount => Bookmarks.Count(bm => string.IsNullOrWhiteSpace(bm.Note) && !string.IsNullOrWhiteSpace(bm.Title));
+        public int OnlyNoteBookmarkCount => Bookmarks.Count(bm => string.IsNullOrWhiteSpace(bm.Title) && !string.IsNullOrWhiteSpace(bm.Note));
+
 
         private void LoadChapters(Book selectedBook)
         {
             Chapters.Clear();
-            if (selectedBook == null)
+            if (selectedBook == null || _connection == null)
                 return;
 
             string sql = $"select StartTime, Name, Duration From Chapters Where Asin = '{selectedBook.Asin}'";
@@ -80,8 +98,8 @@ namespace AudibleBookmarks
                 var ch = new Chapter
                 {
                     Title = reader["Name"] as string,
-                    Duration = reader["Duration"] as long?,
-                    StartTime = reader["StartTime"] as long?
+                    Duration = (long)reader["Duration"],
+                    StartTime = (long)reader["StartTime"]
                 };
                 Chapters.Add(ch);
             }
@@ -92,7 +110,7 @@ namespace AudibleBookmarks
         private void LoadBookmarks(Book selectedBook)
         {
             Bookmarks.Clear();
-            if (selectedBook == null)
+            if (selectedBook == null || _connection == null)
                 return;
 
             string sql = $"select Position, StartPosition, Note, Title, LastModifiedTime From Bookmarks Where Asin = '{selectedBook.Asin}'";
@@ -100,20 +118,20 @@ namespace AudibleBookmarks
             SQLiteDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                var position = reader["Position"] as long?;
+                var position = (long)reader["Position"];
                 Bookmarks.Add(new Bookmark
                 {
                     Note = reader["Note"] as string,
                     Title = reader["Title"] as string,
-                    Modified = reader["LastModifiedTime"] as DateTime?,
+                    Modified = (DateTime)reader["LastModifiedTime"],
                     End = position,
-                    Start = reader["StartPosition"] as long?,
+                    Start = (long)reader["StartPosition"],
                     Chapter = GetChapter(position)
                 });
             }
         }
 
-        private Chapter GetChapter(long? position)
+        private Chapter GetChapter(long position)
         {
             return Chapters.Last(ch => ch.StartTime < position);
         }
@@ -152,7 +170,7 @@ namespace AudibleBookmarks
 
         private bool CanExportExecute()
         {
-            return true;
+            return Bookmarks.Count > 0;
         }
 
         public MainViewModel()
@@ -169,9 +187,6 @@ namespace AudibleBookmarks
 
             _filterableBookmarks = CollectionViewSource.GetDefaultView(Bookmarks);
             _filterableBookmarks.Filter = FilterBookmarks;
-
-
-
 
             Books.Add(new Book
             {
@@ -190,6 +205,8 @@ namespace AudibleBookmarks
             {
                 Title = "Title"
             });
+
+
 
             Bookmarks.Add(new Bookmark
             {
@@ -212,7 +229,11 @@ namespace AudibleBookmarks
                 Note = "Note"
             });
 
-            FileOpened(@"C:\Users\Petr\AppData\Local\Packages\AudibleInc.AudibleforWindowsPhone_xns73kv1ymhp2\LocalState\library - Copy.db");
+
+            SelectedBook = Books[0];
+
+            if (!DesignerProperties.GetIsInDesignMode(new DependencyObject()))
+                FileOpened(@"C:\Users\Petr\AppData\Local\Packages\AudibleInc.AudibleforWindowsPhone_xns73kv1ymhp2\LocalState\library - Copy.db");
 
         }
 
@@ -282,21 +303,62 @@ namespace AudibleBookmarks
         private void LoadBooks()
         {
             Books.Clear();
-            string sql = "select b.Asin, b.Title, b.Duration, b.FileName, ba.Author, bn.Narrator from Books b JOIN BookAuthors ba ON b.Asin = ba.Asin JOIN BookNarrators bn ON b.Asin = bn.Asin";
+
+            var authorDictionary = new Dictionary<string, List<string>>();
+            string sqlAuthors = "select Asin, Author from BookAuthors";
+            SQLiteCommand commandAuthors = new SQLiteCommand(sqlAuthors, _connection);
+            SQLiteDataReader readerAuthors = commandAuthors.ExecuteReader();
+            while (readerAuthors.Read())
+            {
+                var asin = (string)readerAuthors["Asin"];
+                var author = (string)readerAuthors["Author"];
+                if (authorDictionary.ContainsKey(asin))
+                    authorDictionary[asin].Add(author);
+                else
+                    authorDictionary.Add(asin, new List<string> { author });
+            }
+
+
+            var narratorDictionary = new Dictionary<string, List<string>>();
+            string sqlNarrators = "select Asin, Narrator from BookNarrators";
+            SQLiteCommand commandNarrators = new SQLiteCommand(sqlNarrators, _connection);
+            SQLiteDataReader readerNarrators = commandNarrators.ExecuteReader();
+            while (readerNarrators.Read())
+            {
+                var asin = (string)readerNarrators["Asin"];
+                var narrator = (string)readerNarrators["Narrator"];
+                if (narratorDictionary.ContainsKey(asin))
+                    narratorDictionary[asin].Add(narrator);
+                else
+                    narratorDictionary.Add(asin, new List<string> { narrator });
+            }
+
+
+
+
+
+
+            string sql = "select b.Asin, b.Title, b.Duration, b.FileName from Books b";
             SQLiteCommand command = new SQLiteCommand(sql, _connection);
             SQLiteDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
+                var asin = (string)reader["Asin"];
+                var authors = authorDictionary.ContainsKey(asin) ? authorDictionary[asin] : Enumerable.Empty<string>();
+                var narrators = narratorDictionary.ContainsKey(asin) ? narratorDictionary[asin] : Enumerable.Empty<string>();
+
                 Books.Add(new Book
                 {
-                    Asin = reader["Asin"] as string,
-                    Title = reader["Title"] as string,
-                    Author = reader["Author"] as string,
-                    Narrator = reader["Narrator"] as string,
+                    Asin = asin,
+                    Title = (string)reader["Title"],
                     IsDownloaded = (reader["FileName"] as string) != null,
-                    RawLength = reader["Duration"] as long?
+                    RawLength = (long)reader["Duration"],
+                    Author = string.Join(", ", authors),
+                    Narrator = string.Join(", ", narrators)
                 });
             }
+
+
         }
 
         private void OpenSqliteConnection()
@@ -308,6 +370,14 @@ namespace AudibleBookmarks
         private bool CanLoadAudibleLibraryExecute()
         {
             return true;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 
@@ -337,18 +407,9 @@ namespace AudibleBookmarks
             }
         }
 
-        public long? RawLength { get; set; }
+        public long RawLength { get; set; }
 
-        public TimeSpan Length
-        {
-            get
-            {
-                if (RawLength.HasValue)
-                    return TimeSpan.FromTicks(RawLength.Value);
-                else
-                    return TimeSpan.Zero;
-            }
-        }
+        public TimeSpan Length => TimeSpan.FromTicks(RawLength);
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -363,46 +424,27 @@ namespace AudibleBookmarks
     {
         public string Title { get; set; }
         public string Note { get; set; }
-        public long? Start { get; set; }
-        public long? End { get; set; }
-        public TimeSpan PositionOverall
-        {
-            get
-            {
-                if (End.HasValue)
-                    return TimeSpan.FromTicks(End.Value);
-                else
-                    return TimeSpan.Zero;
-            }
-        }
+        public long Start { get; set; }
+        public long End { get; set; }
+        public TimeSpan PositionOverall => TimeSpan.FromTicks(End);
+
         public TimeSpan PositionChapter
         {
             get
             {
-                if (End.HasValue && Chapter.StartTime.HasValue)
-                {
-                    var positionInChapter = End.Value - Chapter.StartTime.Value;
-                    return TimeSpan.FromTicks(positionInChapter);
-                }
-                else
-                    return TimeSpan.Zero;
+                var positionInChapter = End - Chapter.StartTime;
+                return TimeSpan.FromTicks(positionInChapter);
             }
         }
         public Chapter Chapter { get; set; }
-        public DateTime? Modified { get; set; }
-        public bool IsEmptyBookmark
-        {
-            get
-            {
-                return string.IsNullOrWhiteSpace(Title) && string.IsNullOrWhiteSpace(Note);
-            }
-        }
+        public DateTime Modified { get; set; }
+        public bool IsEmptyBookmark => string.IsNullOrWhiteSpace(Title) && string.IsNullOrWhiteSpace(Note);
     }
 
     public class Chapter
     {
         public string Title { get; set; }
-        public long? StartTime { get; set; }
-        public long? Duration { get; set; }
+        public long StartTime { get; set; }
+        public long Duration { get; set; }
     }
 }
