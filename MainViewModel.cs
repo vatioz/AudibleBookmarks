@@ -404,12 +404,15 @@ namespace AudibleBookmarks
                 _chapters = value;
                 OnPropertyChanged(nameof(RawLength));
                 OnPropertyChanged(nameof(Length));
+                OnPropertyChanged(nameof(FormattedLength));
             }
         }
 
         public long RawLength { get; set; }
 
         public TimeSpan Length => TimeSpan.FromTicks(RawLength);
+
+        public string FormattedLength => $"{(int) Length.TotalHours}h {Length.Minutes}m";
 
         public event PropertyChangedEventHandler PropertyChanged;
 
