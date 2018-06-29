@@ -13,7 +13,7 @@ This is small WPF application capable of loading audible SQLite database and the
 * Books with desired bookmarks has to be downloaded through Win10 Audible app
 
 ## Usage:
-* Get latest [release](/release) (the zip file) and unzip localy
+* Get latest [release](https://github.com/vatioz/AudibleBookmarks/releases) (the zip file) and unzip localy
 * Run the AudibleBookmarks.exe
 * Click `Load` button and locate Audible database file
   * usually in C:\Users\\\<account name>\AppData\Local\Packages\AudibleInc.AudibleforWindowsPhone_xns73kv1ymhp2\LocalState\library.db
