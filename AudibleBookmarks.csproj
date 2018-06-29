@@ -75,6 +75,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AlertService.cs" />
     <Compile Include="Book.cs" />
     <Compile Include="Bookmark.cs" />
     <Compile Include="Chapter.cs" />

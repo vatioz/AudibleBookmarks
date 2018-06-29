@@ -20,13 +20,9 @@ namespace AudibleBookmarks
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        // TODO Add inteligent DB seek (auto load)
-        // TODO Add some sort of template for export
+        // TODO Add some sort of template for export and refactor ExportExecute() to separate class
         // TODO Add option to export without empties
         // TODO think about how to display notes (ellipsis..., max lines, max height, max width?)
-        // TODO write README.MD for github
-        // TODO look why there are multiple books for courses
-        // TODO make code more aware of various exception-states (add try catches)
 
 
         // TODO make template of app of this sort with all the necessary starting points - TinyMessenger, RelayCommand, FileDialogService, MainViewModel, ListBox
@@ -66,8 +62,11 @@ namespace AudibleBookmarks
 
         public MainViewModel()
         {
-            var svc = new FileDialogService();
-            svc.StartListening();
+            var fileSvc = new FileDialogService();
+            fileSvc.StartListening();
+            var alertSvc = new AlertService();
+            alertSvc.StartListening();
+
             _dbService = new DatabaseService();
 
             Books = new ObservableCollection<Book>();
@@ -78,9 +77,26 @@ namespace AudibleBookmarks
             FilterableBookmarks = CollectionViewSource.GetDefaultView(Bookmarks);
             FilterableBookmarks.Filter = FilterBookmarks;
 
-            //if (!DesignerProperties.GetIsInDesignMode(new DependencyObject()))
-            //    FileOpened(@"C:\Users\Petr\AppData\Local\Packages\AudibleInc.AudibleforWindowsPhone_xns73kv1ymhp2\LocalState\library - Copy.db");
+            if (!DesignerProperties.GetIsInDesignMode(new DependencyObject()))
+                FileOpened(TryToGuessPathToLibrary());
 
+        }
+
+        private string TryToGuessPathToLibrary()
+        {
+            var localAppData = Environment.GetEnvironmentVariable("LOCALAPPDATA");
+            var pathToPackages = $"{localAppData}\\Packages";
+            if (!Directory.Exists(pathToPackages))
+                return string.Empty;
+            var packages = Directory.EnumerateDirectories(pathToPackages);
+            var audiblePackage = packages.FirstOrDefault(p => p.Contains("AudibleforWindowsPhone"));
+            if (string.IsNullOrWhiteSpace(audiblePackage))
+                return string.Empty;
+            var pathToLibrary = $"{audiblePackage}\\LocalState\\library.db";
+            if (File.Exists(pathToLibrary))
+                return pathToLibrary;
+            else
+                return string.Empty;
         }
 
         #region | Stats
@@ -119,29 +135,40 @@ namespace AudibleBookmarks
         private void ExportExecute()
         {
             var sb = new StringBuilder();
-            foreach (var bookmark in SelectedBook.Bookmarks)
+            try
             {
-                if (bookmark.IsEmptyBookmark)
-                    continue;
+                foreach (var bookmark in SelectedBook.Bookmarks)
+                {
+                    if (bookmark.IsEmptyBookmark)
+                        continue;
 
-                sb.AppendLine(bookmark.Chapter.Title);
-                if (!string.IsNullOrWhiteSpace(bookmark.Title))
-                    sb.AppendLine(bookmark.Title);
-                if (!string.IsNullOrWhiteSpace(bookmark.Note))
-                    sb.AppendLine(bookmark.Note);
+                    sb.AppendLine(bookmark.Chapter.Title);
+                    if (!string.IsNullOrWhiteSpace(bookmark.Title))
+                        sb.AppendLine(bookmark.Title);
+                    if (!string.IsNullOrWhiteSpace(bookmark.Note))
+                        sb.AppendLine(bookmark.Note);
+                }
+
+
+                var dlg = new SaveFileDialog();
+                dlg.Filter = "Text Files (*.txt)|*.txt";
+                dlg.DefaultExt = "txt";
+                dlg.AddExtension = true;
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    using (var stream = dlg.OpenFile())
+                    {
+                        var sw = new StreamWriter(stream);
+                        sw.Write(sb.ToString());
+                        sw.Flush();
+                        sw.Close();
+                    }
+                }
             }
-
-            var dlg = new SaveFileDialog();
-            dlg.Filter = "Text Files (*.txt)|*.txt";
-            dlg.DefaultExt = "txt";
-            dlg.AddExtension = true;
-            if (dlg.ShowDialog() == DialogResult.OK)
+            catch (Exception ex)
             {
-                var stream = dlg.OpenFile();
-                var sw = new StreamWriter(stream);
-                sw.Write(sb.ToString());
-                sw.Flush();
-                sw.Close();
+                PublishException(ex);
+                return;
             }
         }
 
@@ -172,11 +199,14 @@ namespace AudibleBookmarks
                 return true;
 
             var bookmark = item as Bookmark;
+            if (bookmark == null)
+                return true; // just a safeguard, rather leave weird stuff on display
+
             var title = bookmark.Title ?? string.Empty;
             var note = bookmark.Note ?? string.Empty;
             return title.ToUpper().Contains(BookmarkFilterValue.ToUpper()) || note.ToUpper().Contains(BookmarkFilterValue.ToUpper());
         }
-        
+
         private string _bookFilterValue;
         public string BookFilterValue
         {
@@ -197,6 +227,9 @@ namespace AudibleBookmarks
                 return true;
 
             var book = item as Book;
+            if (book == null)
+                return true; // just a safeguard, rather leave weird stuff on display
+
             return book.Title.ToUpper().Contains(BookFilterValue.ToUpper());
         }
 
@@ -206,7 +239,9 @@ namespace AudibleBookmarks
 
         private void FileOpened(string path)
         {
-            //_pathToLibrary = path;
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+                return;
+
             _dbService.OpenSqliteConnection(path);
             LoadBooks();
         }
@@ -240,6 +275,10 @@ namespace AudibleBookmarks
 
         #endregion
 
+        private void PublishException(Exception ex)
+        {
+            TinyMessengerHub.Instance.Publish(new GenericTinyMessage<Exception>(this, ex));
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
