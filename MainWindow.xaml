@@ -65,8 +65,8 @@
                     <StackPanel Width="{Binding ElementName=lbBooks, Path=ActualWidth}"
                         Background="{Binding IsDownloaded, Converter={StaticResource IsDownloadedToBackgroundConverter}}">
                         <TextBlock Text="{Binding Title}" />
-                        <TextBlock Text="{Binding Author}" />
-                         <TextBlock Text="{Binding Narrator}" />
+                        <TextBlock Text="{Binding AuthorLabel}" />
+                         <TextBlock Text="{Binding NarratorLabel}" />
                         <TextBlock Text="{Binding FormattedLength}" />
                             <Separator  />
                         </StackPanel>

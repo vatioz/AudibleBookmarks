@@ -25,8 +25,8 @@ namespace AudibleBookmarks
         public IEnumerable<string> Authors { get; set; }
         public IEnumerable<string> Narrators { get; set; }
 
-        public string AuthorLabel => string.Join(", ", Authors);
-        public string NarratorLabel => string.Join(", ", Narrators);
+        public string AuthorLabel => $"A: {string.Join(", ", Authors)}";
+        public string NarratorLabel => $"N: {string.Join(", ", Narrators)}";
         public bool IsDownloaded { get; set; }
 
         public List<Chapter> Chapters
