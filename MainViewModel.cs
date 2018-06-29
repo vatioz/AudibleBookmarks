@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
@@ -33,6 +35,11 @@ namespace AudibleBookmarks
         private string _pathToLibrary;
         private DatabaseService _dbService;
         private Book _selectedBook;
+
+        public string WinowTitle => $"Audible Bookmarks [{Version}]";
+
+        public string Version => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location)
+            .ProductVersion;
 
         public ObservableCollection<Book> Books { get; set; }
         public ObservableCollection<Bookmark> Bookmarks { get; set; }

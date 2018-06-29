@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:audibleBookmarks="clr-namespace:AudibleBookmarks"
         mc:Ignorable="d"
-        Title="Audible Bookmarks" Height="450" Width="800">
+        Title="{Binding WinowTitle}" Height="450" Width="800">
 
     <Window.DataContext>
         <audibleBookmarks:MainViewModel x:Name="MainViewModel" />
