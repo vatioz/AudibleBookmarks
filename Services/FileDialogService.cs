@@ -52,6 +52,7 @@ namespace AudibleBookmarks.Services
         public void StartListening()
         {
             TinyMessengerHub.Instance.Subscribe<OpenFileMessage>(OpenDialog);
+            TinyMessengerHub.Instance.Subscribe<SaveFileMessage>(SaveDialog);
         }
     }
 

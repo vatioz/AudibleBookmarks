@@ -120,9 +120,7 @@ namespace AudibleBookmarks.ViewModels
             try
             {
                 var sb = BuildExportString();
-
                 TinyMessengerHub.Instance.Publish(new SaveFileMessage(this, stream => { SaveFile(stream, sb); }));
-                
             }
             catch (Exception ex)
             {
