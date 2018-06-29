@@ -20,8 +20,6 @@ namespace AudibleBookmarks.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        // TODO refactor ExportExecute() to separate class
-        // TODO Add option to export without empties
         // TODO think about how to display notes (ellipsis..., max lines, max height, max width?)
 
 
@@ -78,26 +76,10 @@ namespace AudibleBookmarks.ViewModels
             FilterableBookmarks.Filter = FilterBookmarks;
 
             if (!DesignerProperties.GetIsInDesignMode(new DependencyObject()))
-                FileOpened(TryToGuessPathToLibrary());
-
+                FileOpened(PathHelper.TryToGuessPathToLibrary());
         }
 
-        private string TryToGuessPathToLibrary()
-        {
-            var localAppData = Environment.GetEnvironmentVariable("LOCALAPPDATA");
-            var pathToPackages = $"{localAppData}\\Packages";
-            if (!Directory.Exists(pathToPackages))
-                return string.Empty;
-            var packages = Directory.EnumerateDirectories(pathToPackages);
-            var audiblePackage = packages.FirstOrDefault(p => p.Contains("AudibleforWindowsPhone"));
-            if (string.IsNullOrWhiteSpace(audiblePackage))
-                return string.Empty;
-            var pathToLibrary = $"{audiblePackage}\\LocalState\\library.db";
-            if (File.Exists(pathToLibrary))
-                return pathToLibrary;
-            else
-                return string.Empty;
-        }
+        
 
         #region | Stats
 
@@ -134,43 +116,13 @@ namespace AudibleBookmarks.ViewModels
 
         private void ExportExecute()
         {
-            var sb = new StringBuilder();
+            
             try
             {
-                var template = File.ReadAllText("BookmarkTemplate.txt");
+                var sb = BuildExportString();
 
-                foreach (var bookmark in SelectedBook.Bookmarks)
-                {
-                    if (bookmark.IsEmptyBookmark)
-                        continue;
-
-                    var propDictionary = new Dictionary<string, object>();
-                    propDictionary.Add(nameof(Bookmark.Title), bookmark.Title);
-                    propDictionary.Add(nameof(Bookmark.Note), bookmark.Note);
-                    propDictionary.Add(nameof(Bookmark.PositionChapter), bookmark.PositionChapter);
-                    propDictionary.Add(nameof(Bookmark.PositionOverall), bookmark.PositionOverall);
-                    propDictionary.Add("ChapterTitle", bookmark.Chapter.Title);
-                    
-
-                    var populatedTemplate = template.Inject(propDictionary);
-                    sb.AppendLine(populatedTemplate);
-                }
-
-
-                var dlg = new SaveFileDialog();
-                dlg.Filter = "Text Files (*.txt)|*.txt";
-                dlg.DefaultExt = "txt";
-                dlg.AddExtension = true;
-                if (dlg.ShowDialog() == DialogResult.OK)
-                {
-                    using (var stream = dlg.OpenFile())
-                    {
-                        var sw = new StreamWriter(stream);
-                        sw.Write(sb.ToString());
-                        sw.Flush();
-                        sw.Close();
-                    }
-                }
+                TinyMessengerHub.Instance.Publish(new SaveFileMessage(this, stream => { SaveFile(stream, sb); }));
+                
             }
             catch (Exception ex)
             {
@@ -178,7 +130,39 @@ namespace AudibleBookmarks.ViewModels
                 return;
             }
         }
-        
+
+        private void SaveFile(Stream stream, StringBuilder stringBuilder)
+        {
+            using (var sw = new StreamWriter(stream))
+            {
+                sw.Write(stringBuilder.ToString());
+                sw.Flush();
+            }
+        }
+
+        private StringBuilder BuildExportString()
+        {
+            var template = File.ReadAllText("BookmarkTemplate.txt");
+            var sb = new StringBuilder();
+            foreach (var bookmark in SelectedBook.Bookmarks)
+            {
+                if (bookmark.IsEmptyBookmark)
+                    continue;
+
+                var propDictionary = new Dictionary<string, object>();
+                propDictionary.Add(nameof(Bookmark.Title), bookmark.Title);
+                propDictionary.Add(nameof(Bookmark.Note), bookmark.Note);
+                propDictionary.Add(nameof(Bookmark.PositionChapter), bookmark.PositionChapter);
+                propDictionary.Add(nameof(Bookmark.PositionOverall), bookmark.PositionOverall);
+                propDictionary.Add("ChapterTitle", bookmark.Chapter.Title);
+
+
+                var populatedTemplate = template.Inject(propDictionary);
+                sb.AppendLine(populatedTemplate);
+            }
+            return sb;
+        }
+
         #endregion
 
         #region | Filtering stuff
