@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using AudibleBookmarks.Annotations;
 
@@ -8,20 +10,26 @@ namespace AudibleBookmarks
 {
     public class Book : INotifyPropertyChanged
     {
-        private IEnumerable<Chapter> _chapters;
+        private List<Chapter> _chapters;
+        private ObservableCollection<Bookmark> _bookmarks;
 
         public Book()
         {
             Chapters = new List<Chapter>();
+            Bookmarks = new ObservableCollection<Bookmark>();
+            
         }
 
         public string Asin { get; set; }
         public string Title { get; set; }
-        public string Author { get; set; }
-        public string Narrator { get; set; }
+        public IEnumerable<string> Authors { get; set; }
+        public IEnumerable<string> Narrators { get; set; }
+
+        public string AuthorLabel => string.Join(", ", Authors);
+        public string NarratorLabel => string.Join(", ", Narrators);
         public bool IsDownloaded { get; set; }
 
-        public IEnumerable<Chapter> Chapters
+        public List<Chapter> Chapters
         {
             get { return _chapters; }
             set
@@ -33,11 +41,30 @@ namespace AudibleBookmarks
             }
         }
 
+        public ObservableCollection<Bookmark> Bookmarks
+        {
+            get { return _bookmarks; }
+            set
+            {
+                _bookmarks = value;
+                OnPropertyChanged();
+            }
+        }
+
         public long RawLength { get; set; }
 
         public TimeSpan Length => TimeSpan.FromTicks(RawLength);
 
         public string FormattedLength => $"{(int) Length.TotalHours}h {Length.Minutes}m";
+
+
+        public Chapter GetChapter(long position)
+        {
+            return Chapters.Last(ch => ch.StartTime < position);
+        }
+
+
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 

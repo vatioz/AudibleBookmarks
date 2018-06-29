@@ -78,6 +78,7 @@
     <Compile Include="Book.cs" />
     <Compile Include="Bookmark.cs" />
     <Compile Include="Chapter.cs" />
+    <Compile Include="DatabaseService.cs" />
     <Compile Include="FileDialogService.cs" />
     <Compile Include="IsDownloadedToBackgroundConverter.cs" />
     <Compile Include="Properties\Annotations.cs" />
