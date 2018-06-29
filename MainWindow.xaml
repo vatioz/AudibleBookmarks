@@ -6,6 +6,7 @@
         xmlns:audibleBookmarks="clr-namespace:AudibleBookmarks"
         mc:Ignorable="d"
         Title="Audible Bookmarks" Height="450" Width="800">
+    
     <Window.DataContext>
         <audibleBookmarks:MainViewModel x:Name="MainViewModel" />
     </Window.DataContext>
@@ -13,6 +14,7 @@
         <audibleBookmarks:IsDownloadedToBackgroundConverter x:Key="IsDownloadedToBackgroundConverter"  />
         <audibleBookmarks:BookmarkStateConverter x:Key="BookmarkStateConverter"  />
     </Window.Resources>
+    
     <Grid>
         <Button Content="Load Audible DB" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Padding="10 5" Command="{Binding LoadAudibleLibrary}"/>
         <ListBox HorizontalAlignment="Left" Height="338" Margin="10,71,0,0" VerticalAlignment="Top" Width="294" SelectedItem="{Binding SelectedBook}" ItemsSource="{Binding FilterableBooks}">
@@ -22,6 +24,7 @@
                         <TextBlock Text="{Binding Title}" />
                         <TextBlock Text="{Binding Author}" />
                         <TextBlock Text="{Binding Narrator}" />
+                        <TextBlock Text="{Binding Length,StringFormat=hh\\:mm}" />
                         <Separator  />
                     </StackPanel>
                 </DataTemplate>
@@ -31,9 +34,18 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel MinWidth="200" Background="{Binding IsEmptyBookmark, Converter={StaticResource BookmarkStateConverter}}">
+                        <TextBlock>
+                            <Run Text="{Binding Chapter.Title}" FontWeight="Bold" FontSize="14"/>
+                            <Run Text=" / " FontWeight="Bold"/>
+                            <Run Text="{Binding PositionChapter, Mode=OneTime, StringFormat=hh\\:mm\\:ss}" FontWeight="Normal" />
+                        </TextBlock>
+                        <TextBlock>
+                            <Run Text="(" />
+                            <Run Text="{Binding PositionOverall, Mode=OneTime, StringFormat=hh\\:mm\\:ss}" FontStyle="Italic" />
+                            <Run Text=")" />
+                        </TextBlock> 
                         <TextBlock Text="{Binding Title}" />
-                        <TextBlock Text="{Binding Note}" />
-                        <TextBlock Text="{Binding Chapter}" />
+                        <TextBlock Text="{Binding Note}" FontStyle="Italic" />
                         <Separator  />
                     </StackPanel>
                 </DataTemplate>
