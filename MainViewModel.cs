@@ -78,8 +78,8 @@ namespace AudibleBookmarks
             FilterableBookmarks = CollectionViewSource.GetDefaultView(Bookmarks);
             FilterableBookmarks.Filter = FilterBookmarks;
 
-            if (!DesignerProperties.GetIsInDesignMode(new DependencyObject()))
-                FileOpened(@"C:\Users\Petr\AppData\Local\Packages\AudibleInc.AudibleforWindowsPhone_xns73kv1ymhp2\LocalState\library - Copy.db");
+            //if (!DesignerProperties.GetIsInDesignMode(new DependencyObject()))
+            //    FileOpened(@"C:\Users\Petr\AppData\Local\Packages\AudibleInc.AudibleforWindowsPhone_xns73kv1ymhp2\LocalState\library - Copy.db");
 
         }
 
