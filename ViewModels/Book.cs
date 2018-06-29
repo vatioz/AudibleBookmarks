@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using AudibleBookmarks.Annotations;
 
-namespace AudibleBookmarks
+namespace AudibleBookmarks.ViewModels
 {
     public class Book : INotifyPropertyChanged
     {

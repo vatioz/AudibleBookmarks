@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -14,13 +13,14 @@ using System.Windows.Data;
 using System.Windows.Forms;
 using System.Windows.Input;
 using AudibleBookmarks.Annotations;
-using TinyMessenger;
+using AudibleBookmarks.Services;
+using AudibleBookmarks.Utils;
 
-namespace AudibleBookmarks
+namespace AudibleBookmarks.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        // TODO Add some sort of template for export and refactor ExportExecute() to separate class
+        // TODO refactor ExportExecute() to separate class
         // TODO Add option to export without empties
         // TODO think about how to display notes (ellipsis..., max lines, max height, max width?)
 
@@ -137,16 +137,23 @@ namespace AudibleBookmarks
             var sb = new StringBuilder();
             try
             {
+                var template = File.ReadAllText("BookmarkTemplate.txt");
+
                 foreach (var bookmark in SelectedBook.Bookmarks)
                 {
                     if (bookmark.IsEmptyBookmark)
                         continue;
 
-                    sb.AppendLine(bookmark.Chapter.Title);
-                    if (!string.IsNullOrWhiteSpace(bookmark.Title))
-                        sb.AppendLine(bookmark.Title);
-                    if (!string.IsNullOrWhiteSpace(bookmark.Note))
-                        sb.AppendLine(bookmark.Note);
+                    var propDictionary = new Dictionary<string, object>();
+                    propDictionary.Add(nameof(Bookmark.Title), bookmark.Title);
+                    propDictionary.Add(nameof(Bookmark.Note), bookmark.Note);
+                    propDictionary.Add(nameof(Bookmark.PositionChapter), bookmark.PositionChapter);
+                    propDictionary.Add(nameof(Bookmark.PositionOverall), bookmark.PositionOverall);
+                    propDictionary.Add("ChapterTitle", bookmark.Chapter.Title);
+                    
+
+                    var populatedTemplate = template.Inject(propDictionary);
+                    sb.AppendLine(populatedTemplate);
                 }
 
 
@@ -171,7 +178,7 @@ namespace AudibleBookmarks
                 return;
             }
         }
-
+        
         #endregion
 
         #region | Filtering stuff

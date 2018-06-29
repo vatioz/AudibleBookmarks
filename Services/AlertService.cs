@@ -1,9 +1,7 @@
-﻿
-using System;
+﻿using System;
 using System.Windows.Forms;
-using TinyMessenger;
 
-namespace AudibleBookmarks
+namespace AudibleBookmarks.Services
 {
     public class AlertService
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace AudibleBookmarks
+namespace AudibleBookmarks.Utils
 {
     public class RelayCommand : ICommand
     {

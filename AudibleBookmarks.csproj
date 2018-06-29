@@ -75,16 +75,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AlertService.cs" />
-    <Compile Include="Book.cs" />
-    <Compile Include="Bookmark.cs" />
-    <Compile Include="Chapter.cs" />
-    <Compile Include="DatabaseService.cs" />
-    <Compile Include="FileDialogService.cs" />
-    <Compile Include="IsDownloadedToBackgroundConverter.cs" />
+    <Compile Include="Converters\BookmarkStateConverter.cs" />
+    <Compile Include="Services\AlertService.cs" />
+    <Compile Include="ViewModels\Book.cs" />
+    <Compile Include="ViewModels\Bookmark.cs" />
+    <Compile Include="ViewModels\Chapter.cs" />
+    <Compile Include="Services\DatabaseService.cs" />
+    <Compile Include="Services\FileDialogService.cs" />
+    <Compile Include="Converters\IsDownloadedToBackgroundConverter.cs" />
     <Compile Include="Properties\Annotations.cs" />
-    <Compile Include="RelayCommand.cs" />
-    <Compile Include="TinyMessenger.cs" />
+    <Compile Include="Utils\RelayCommand.cs" />
+    <Compile Include="Utils\StringInjectExtension.cs" />
+    <Compile Include="Services\TinyMessenger.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -93,7 +95,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainViewModel.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -131,6 +133,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="AudibleBookmarks.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="BookmarkTemplate.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\System.Data.SQLite.Core.1.0.108.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('packages\System.Data.SQLite.Core.1.0.108.0\build\net46\System.Data.SQLite.Core.targets')" />

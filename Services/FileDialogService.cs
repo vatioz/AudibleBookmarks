@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
-using TinyMessenger;
 
-namespace AudibleBookmarks
+namespace AudibleBookmarks.Services
 {
     class FileDialogService
     {

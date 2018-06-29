@@ -1,4 +1,4 @@
-namespace AudibleBookmarks
+namespace AudibleBookmarks.ViewModels
 {
     public class Chapter
     {

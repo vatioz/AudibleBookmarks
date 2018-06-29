@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TinyMessenger;
+using AudibleBookmarks.ViewModels;
 
-namespace AudibleBookmarks
+namespace AudibleBookmarks.Services
 {
     public class DatabaseService
     {
@@ -183,8 +181,8 @@ namespace AudibleBookmarks
                     var position = (long)reader["Position"];
                     selectedBook.Bookmarks.Add(new Bookmark
                     {
-                        Note = reader["Note"] as string,
-                        Title = reader["Title"] as string,
+                        Note = Sanitize(reader["Note"] as string),
+                        Title = Sanitize(reader["Title"] as string),
                         Modified = (DateTime)reader["LastModifiedTime"],
                         End = position,
                         Start = (long)reader["StartPosition"],
@@ -197,6 +195,15 @@ namespace AudibleBookmarks
                 _connection = null;
                 PublishException(ex);
             }
+        }
+
+        private string Sanitize(string str)
+        {
+            if (str == null)
+                return string.Empty;
+
+            string decoded = str.Replace("&amp;", "&").Replace("&lt;", "<").Replace("&gt;", ">").Replace("&quot;", "\"").Replace("&apos;", "'");
+            return decoded;
         }
     }
 }
