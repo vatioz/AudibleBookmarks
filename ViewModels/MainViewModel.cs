@@ -10,9 +10,12 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Forms;
 using System.Windows.Input;
 using AudibleBookmarks.Annotations;
+using AudibleBookmarks.Core.Messenger;
+using AudibleBookmarks.Core.Models;
+using AudibleBookmarks.Core.Services;
+using AudibleBookmarks.Core.Utils;
 using AudibleBookmarks.Services;
 using AudibleBookmarks.Utils;
 
@@ -62,9 +65,9 @@ namespace AudibleBookmarks.ViewModels
 
         public MainViewModel()
         {
-            var fileSvc = new FileDialogService();
+            ISubscribable fileSvc = new FileDialogService();
             fileSvc.StartListening();
-            var alertSvc = new AlertService();
+            ISubscribable alertSvc = new AlertService();
             alertSvc.StartListening();
 
             _dbService = new DatabaseService();

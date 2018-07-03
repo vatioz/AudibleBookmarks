@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SQLite;
 using System.Linq;
-using AudibleBookmarks.ViewModels;
+using AudibleBookmarks.Core.Messenger;
+using AudibleBookmarks.Core.Models;
+using Microsoft.Data.Sqlite;
 
-namespace AudibleBookmarks.Services
+namespace AudibleBookmarks.Core.Services
 {
     public class DatabaseService
     {
-        private SQLiteConnection _connection;
+        private SqliteConnection _connection;
 
         public void OpenSqliteConnection(string pathToLibrary)
         {
@@ -17,7 +18,8 @@ namespace AudibleBookmarks.Services
             {
                 _connection?.Close();
 
-                _connection = new SQLiteConnection($"Data Source={pathToLibrary};Version=3;");
+                //_connection = new SqliteConnection($"Data Source={pathToLibrary};Version=3;");
+                _connection = new SqliteConnection($"Data Source={pathToLibrary};");
                 _connection.Open();
             }
             catch (Exception ex)
@@ -41,9 +43,9 @@ namespace AudibleBookmarks.Services
 
             try
             {
-                string sqlNarrators = "select Asin, Narrator from BookNarrators";
-                SQLiteCommand commandNarrators = new SQLiteCommand(sqlNarrators, _connection);
-                SQLiteDataReader readerNarrators = commandNarrators.ExecuteReader();
+                var sqlNarrators = "select Asin, Narrator from BookNarrators";
+                var commandNarrators = new SqliteCommand(sqlNarrators, _connection);
+                var readerNarrators = commandNarrators.ExecuteReader();
                 while (readerNarrators.Read())
                 {
                     var asin = (string)readerNarrators["Asin"];
@@ -70,9 +72,9 @@ namespace AudibleBookmarks.Services
 
             try
             {
-                string sqlAuthors = "select Asin, Author from BookAuthors";
-                SQLiteCommand commandAuthors = new SQLiteCommand(sqlAuthors, _connection);
-                SQLiteDataReader readerAuthors = commandAuthors.ExecuteReader();
+                var sqlAuthors = "select Asin, Author from BookAuthors";
+                var commandAuthors = new SqliteCommand(sqlAuthors, _connection);
+                var readerAuthors = commandAuthors.ExecuteReader();
                 while (readerAuthors.Read())
                 {
                     var asin = (string)readerAuthors["Asin"];
@@ -103,9 +105,9 @@ namespace AudibleBookmarks.Services
             var books = new List<Book>();
             try
             {
-                string sql = "select b.Asin, b.Title, b.Duration, b.FileName from Books b";
-                SQLiteCommand command = new SQLiteCommand(sql, _connection);
-                SQLiteDataReader reader = command.ExecuteReader();
+                var sql = "select b.Asin, b.Title, b.Duration, b.FileName from Books b";
+                var command = new SqliteCommand(sql, _connection);
+                var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
                     var asin = (string)reader["Asin"];
@@ -144,9 +146,9 @@ namespace AudibleBookmarks.Services
 
             try
             {
-                string sql = $"select StartTime, Name, Duration From Chapters Where Asin = '{selectedBook.Asin}'";
-                SQLiteCommand command = new SQLiteCommand(sql, _connection);
-                SQLiteDataReader reader = command.ExecuteReader();
+                var sql = $"select StartTime, Name, Duration From Chapters Where Asin = '{selectedBook.Asin}'";
+                var command = new SqliteCommand(sql, _connection);
+                var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
                     var ch = new Chapter
@@ -173,9 +175,9 @@ namespace AudibleBookmarks.Services
 
             try
             {
-                string sql = $"select Position, StartPosition, Note, Title, LastModifiedTime From Bookmarks Where Asin = '{selectedBook.Asin}'";
-                SQLiteCommand command = new SQLiteCommand(sql, _connection);
-                SQLiteDataReader reader = command.ExecuteReader();
+                var sql = $"select Position, StartPosition, Note, Title, LastModifiedTime From Bookmarks Where Asin = '{selectedBook.Asin}'";
+                var command = new SqliteCommand(sql, _connection);
+                var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
                     var position = (long)reader["Position"];
@@ -183,7 +185,7 @@ namespace AudibleBookmarks.Services
                     {
                         Note = Sanitize(reader["Note"] as string),
                         Title = Sanitize(reader["Title"] as string),
-                        Modified = (DateTime)reader["LastModifiedTime"],
+                        Modified = DateTime.Parse((string)reader["LastModifiedTime"]),
                         End = position,
                         Start = (long)reader["StartPosition"],
                         Chapter = selectedBook.GetChapter(position)
