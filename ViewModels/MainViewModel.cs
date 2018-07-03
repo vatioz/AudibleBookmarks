@@ -21,7 +21,9 @@ namespace AudibleBookmarks.ViewModels
     public class MainViewModel : INotifyPropertyChanged
     {
         // TODO think about how to display notes (ellipsis..., max lines, max height, max width?)
-
+        // TODO add about
+        // TODO add help
+        // tODO icon?
 
         // TODO make template of app of this sort with all the necessary starting points - TinyMessenger, RelayCommand, FileDialogService, MainViewModel, ListBox
 
