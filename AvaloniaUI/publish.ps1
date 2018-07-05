@@ -1,4 +1,4 @@
-﻿$version = "v0.4-alpha"
+﻿$version = "v0.5-alpha"
 $product = "AudibleBookmarks"
 $project = "D:\_sources\AudibleBookmarks\AvaloniaUI\AvaloniaUI.csproj"
 $output = "D:\_sources\AudibleBookmarks\_releases"
@@ -18,10 +18,27 @@ $runtimes | %{
     & $dotnet publish $project -c release -r $_ /p:TrimUnusedDependencies=true -o ("{0}\{1}" -f $output,$_)
 }
 
+$assets = @()
 
 $runtimes | %{
     $runtime = $_
     $toPack = ("{0}\{1}" -f $output,$runtime)
-    $zipFile = ("{0}\{1}.{2}.{3}.zip" -f $output,$product,$version,$runtime)
+    $fileName = "{0}.{1}.{2}" -f $product,$version,$runtime
+    $zipFile = ("{0}\{1}.zip" -f $output,$fileName)
     Compress-Archive -Path $toPack -DestinationPath $zipFile
+    $asset = @{
+        Path=$zipFile;
+        "Content-Type"="application/zip";
+        Name = $fileName
+    }
+    $assets += $asset
 }
+
+
+
+$tmp = Set-GitHubSessionInformation -Username vatioz
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$release = New-GitHubRelease -Repository $product -Name "$product $version" -Tag $version -Asset $assets -Prerelease -Verbose
+
+# show me
+Start-Process $release.html_url
