@@ -180,16 +180,25 @@ namespace AudibleBookmarks.Core.Services
                 var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    var position = (long)reader["Position"];
-                    selectedBook.Bookmarks.Add(new Bookmark
+                    try
                     {
-                        Note = Sanitize(reader["Note"] as string),
-                        Title = Sanitize(reader["Title"] as string),
-                        Modified = DateTime.Parse((string)reader["LastModifiedTime"]),
-                        End = position,
-                        Start = (long)reader["StartPosition"],
-                        Chapter = selectedBook.GetChapter(position)
-                    });
+                        var position = (long)reader["Position"];
+                        var startPosition = (long)reader["StartPosition"];
+                        selectedBook.Bookmarks.Add(new Bookmark
+                        {
+                            Note = Sanitize(reader["Note"] as string),
+                            Title = Sanitize(reader["Title"] as string),
+                            Modified = DateTime.Parse((string)reader["LastModifiedTime"]),
+                            End = position,
+                            Start = startPosition,
+                            Chapter = selectedBook.GetChapter(position)
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        _connection = null;
+                        PublishException(ex);
+                    }
                 }
             }
             catch (Exception ex)

@@ -1,0 +1,5 @@
+﻿{ChapterTitle} / {PositionChapter}
+From begining: {PositionOverall}
+Title: {Title}
+Note: {Note}
+----
