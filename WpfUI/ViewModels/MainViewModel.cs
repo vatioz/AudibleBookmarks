@@ -35,11 +35,8 @@ namespace AudibleBookmarks.ViewModels
         private DatabaseService _dbService;
         private Book _selectedBook;
 
-        public string WinowTitle => $"Audible Bookmarks [{Version}]";
-
-        public string Version => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location)
-            .ProductVersion;
-
+        public string WinowTitle => TitleProvider.GetTitleWithVersion();
+        
         public ObservableCollection<Book> Books { get; set; }
         public ObservableCollection<Bookmark> Bookmarks { get; set; }
 
