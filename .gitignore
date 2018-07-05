@@ -28,6 +28,9 @@ obj/
 # NuGet
 packages/
 
+# Releases
+_releases/
+
 # =========================
 # Operating System Files
 # =========================
