@@ -30,7 +30,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Button Grid.Column="0" Grid.Row="0" 
+        <Button Grid.Column="0" Grid.Row="0"                 
                 Content="Load Audible DB"
                 VerticalAlignment="Top" 
                 HorizontalAlignment="Left" 

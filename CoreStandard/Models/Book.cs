@@ -16,7 +16,7 @@ namespace AudibleBookmarks.Core.Models
         {
             Chapters = new List<Chapter>();
             Bookmarks = new ObservableCollection<Bookmark>();
-            
+
         }
 
         public string Asin { get; set; }
@@ -54,13 +54,13 @@ namespace AudibleBookmarks.Core.Models
 
         public TimeSpan Length => TimeSpan.FromTicks(RawLength);
 
-        public string FormattedLength => $"{(int) Length.TotalHours}h {Length.Minutes}m";
+        public string FormattedLength => $"{(int)Length.TotalHours}h {Length.Minutes}m";
 
 
         public Chapter GetChapter(long position)
         {
             return Chapters.Last(ch => ch.StartTime < position);
-        }
+        }      
 
 
 

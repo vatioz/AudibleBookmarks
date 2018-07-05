@@ -58,7 +58,6 @@ namespace AudibleBookmarks.Core.Services
             }
             catch (Exception ex)
             {
-                _connection = null;
                 PublishException(ex);
             }
             return narratorDictionary;
@@ -87,7 +86,6 @@ namespace AudibleBookmarks.Core.Services
             }
             catch (Exception ex)
             {
-                _connection = null;
                 PublishException(ex);
             }
             return authorDictionary;
@@ -132,7 +130,6 @@ namespace AudibleBookmarks.Core.Services
             }
             catch (Exception ex)
             {
-                _connection = null;
                 PublishException(ex);
             }
 
@@ -163,7 +160,6 @@ namespace AudibleBookmarks.Core.Services
             }
             catch (Exception ex)
             {
-                _connection = null;
                 PublishException(ex);
             }
         }
@@ -196,14 +192,12 @@ namespace AudibleBookmarks.Core.Services
                     }
                     catch (Exception ex)
                     {
-                        _connection = null;
                         PublishException(ex);
                     }
                 }
             }
             catch (Exception ex)
             {
-                _connection = null;
                 PublishException(ex);
             }
         }

@@ -21,7 +21,7 @@ namespace AvaloniaUI.Views
 
         private void InitializeComponent()
         {
-            AvaloniaXamlLoader.Load(this);
+            AvaloniaXamlLoader.Load(this);            
         }
 
         //public static readonly DependencyProperty ViewModelProperty =

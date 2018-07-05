@@ -6,6 +6,20 @@
         xmlns:corevm="clr-namespace:AudibleBookmarks.Core.Models;assembly=CoreStandard"
         Title="{Binding WinowTitle}">
 
+  <Window.Styles>
+    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="LightBlue"/>
+    </Style>
+    <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+      <Setter Property="Background" Value="LightYellow"/>
+    </Style>
+    <Style Selector="ListBoxItem:selected:focus /template/ ContentPresenter">
+      <Setter Property="Background" Value="LightGray"/>
+    </Style>
+
+    
+  </Window.Styles>
+
   <Window.Resources>
     <converters:IsDownloadedToBackgroundConverter x:Key="IsDownloadedToBackgroundConverter"  />
     <converters:BookmarkStateConverter x:Key="BookmarkStateConverter"  />
@@ -13,13 +27,15 @@
 
   <Window.DataTemplates>
     <DataTemplate DataType="corevm:Book">
-      <StackPanel>
-        <TextBlock Text="{Binding Title}" FontWeight="Bold" Margin="0 5" />
-        <TextBlock Text="{Binding AuthorLabel}" />
-        <TextBlock Text="{Binding NarratorLabel}" />
-        <TextBlock Text="{Binding FormattedLength}" />
-        <Separator  Height="2" Background="Gray" Width="50" Margin="5" />
-      </StackPanel>
+      <Border BorderBrush="Gray" BorderThickness="1" Classes="book" >
+        <StackPanel  Margin="5" >
+          <TextBlock Text="{Binding Title}" Background="{Binding DownloadStatusBackground}" FontWeight="Bold" Margin="0 5" />
+          <TextBlock Text="{Binding AuthorLabel}" />
+          <TextBlock Text="{Binding NarratorLabel}" />
+          <TextBlock Text="{Binding FormattedLength}" />
+          <!--<Separator  Height="2" Background="Gray" Width="50" Margin="5" />-->
+        </StackPanel>
+      </Border>
     </DataTemplate>
     <DataTemplate DataType="corevm:Bookmark">
       <StackPanel>
@@ -63,6 +79,7 @@
     </Grid.RowDefinitions>
 
     <Button Grid.Column="0" Grid.Row="0"
+            x:Name="btn"
             Content="Load Audible DB"
             VerticalAlignment="Top"
             HorizontalAlignment="Left"

@@ -11,7 +11,8 @@ namespace AvaloniaUI.Converters
         {
             var isDownloaded = (bool)value;
 
-            return isDownloaded ? Brushes.LightGreen : Brushes.LightSlateGray;
+            //return isDownloaded ? Brushes.LightGreen : Brushes.Azure;
+            return "converted";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
