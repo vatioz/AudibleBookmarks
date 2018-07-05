@@ -121,27 +121,16 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include=".gitattributes" />
-    <None Include=".gitignore" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="AudibleBookmarks.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="BookmarkTemplate.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="CoreStandard\CoreStandard.csproj">
+    <ProjectReference Include="..\CoreStandard\CoreStandard.csproj">
       <Project>{bb1852e7-9176-4766-a84d-7e8c2e94b8ac}</Project>
       <Name>CoreStandard</Name>
     </ProjectReference>
