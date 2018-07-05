@@ -1,9 +1,11 @@
-﻿using System;
+﻿using AudibleBookmarks.Core.Messenger;
+using AudibleBookmarks.Core.Services;
+using System;
 using System.Windows.Forms;
 
 namespace AudibleBookmarks.Services
 {
-    public class AlertService
+    public class AlertService : ISubscribable, IAlertService
     {
         public void StartListening()
         {
@@ -12,7 +14,12 @@ namespace AudibleBookmarks.Services
 
         private void ShowAlert(GenericTinyMessage<Exception> msg)
         {
-            MessageBox.Show(msg.Content.Message);
+            ShowAlert(msg.Content);
+        }
+
+        public void ShowAlert(Exception ex)
+        {
+            MessageBox.Show(ex.Message);
         }
     }
 }

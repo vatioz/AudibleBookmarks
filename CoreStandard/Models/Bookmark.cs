@@ -1,6 +1,6 @@
 using System;
 
-namespace AudibleBookmarks.ViewModels
+namespace AudibleBookmarks.Core.Models
 {
     public class Bookmark
     {

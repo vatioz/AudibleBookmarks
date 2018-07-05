@@ -2,10 +2,13 @@
 using System.IO;
 using System.Linq;
 
-namespace AudibleBookmarks.Utils
+namespace AudibleBookmarks.Core.Utils
 {
     public class PathHelper
     {
+
+        // TODO this is Windows 10 specific
+
         public static string TryToGuessPathToLibrary()
         {
             var localAppData = Environment.GetEnvironmentVariable("LOCALAPPDATA");

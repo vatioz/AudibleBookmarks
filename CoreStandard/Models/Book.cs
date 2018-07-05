@@ -4,9 +4,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using AudibleBookmarks.Annotations;
 
-namespace AudibleBookmarks.ViewModels
+namespace AudibleBookmarks.Core.Models
 {
     public class Book : INotifyPropertyChanged
     {
@@ -68,7 +67,6 @@ namespace AudibleBookmarks.ViewModels
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

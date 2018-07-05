@@ -1,12 +1,12 @@
-﻿using System;
-using System.IO;
+﻿using AudibleBookmarks.Core.Messenger;
+using AudibleBookmarks.Core.Services;
 using System.Windows.Forms;
 
 namespace AudibleBookmarks.Services
 {
-    class FileDialogService
+    public class FileDialogService: ISubscribable, IFileDialogable
     {
-        private void OpenDialog(OpenFileMessage msg)
+        public void OpenDialog(OpenFileMessage msg)
         {
             var ofd = new OpenFileDialog();
             ofd.RestoreDirectory = true;
@@ -27,7 +27,7 @@ namespace AudibleBookmarks.Services
             }
         }
 
-        private void SaveDialog(SaveFileMessage msg)
+        public void SaveDialog(SaveFileMessage msg)
         {
             var dlg = new SaveFileDialog();
             dlg.Filter = "Text Files (*.txt)|*.txt";
@@ -54,43 +54,5 @@ namespace AudibleBookmarks.Services
             TinyMessengerHub.Instance.Subscribe<OpenFileMessage>(OpenDialog);
             TinyMessengerHub.Instance.Subscribe<SaveFileMessage>(SaveDialog);
         }
-    }
-
-    public class OpenFileMessage : TinyMessageBase
-    {
-        public OpenFileMessage(object sender, Action<Stream> fileSelectedAction) : base(sender)
-        {
-            OpenStreamAction = fileSelectedAction;
-            OpenStream = true;
-        }
-        public OpenFileMessage(object sender, Action<string> fileSelectedAction) : base(sender)
-        {
-            PassFileNameAction = fileSelectedAction;
-            OpenStream = false;
-        }
-
-        public bool OpenStream { get; set; }
-        public Action<Stream> OpenStreamAction { get; set; }
-
-        public Action<string> PassFileNameAction { get; set; }
-    }
-
-    public class SaveFileMessage : TinyMessageBase
-    {
-        public SaveFileMessage(object sender, Action<Stream> fileSelectedAction) : base(sender)
-        {
-            OpenStreamAction = fileSelectedAction;
-            OpenStream = true;
-        }
-        public SaveFileMessage(object sender, Action<string> fileSelectedAction) : base(sender)
-        {
-            PassFileNameAction = fileSelectedAction;
-            OpenStream = false;
-        }
-
-        public bool OpenStream { get; set; }
-        public Action<Stream> OpenStreamAction { get; set; }
-
-        public Action<string> PassFileNameAction { get; set; }
     }
 }

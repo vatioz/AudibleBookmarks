@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AudibleBookmarks.Services
+namespace AudibleBookmarks.Core.Messenger
 {
     #region Message Types / Interfaces
 

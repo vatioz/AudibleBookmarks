@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 
 [assembly: CLSCompliant(true)]
-namespace AudibleBookmarks.Utils
+namespace AudibleBookmarks.Core.Utils
 {
 	public static class StringInjectExtension
 	{
