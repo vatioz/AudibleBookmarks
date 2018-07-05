@@ -6,19 +6,19 @@ using AvaloniaUI.Services;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace AvaloniaUI.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase, INotifyPropertyChanged
     {
-        private string _pathToLibrary;
+
+        // tODO GridSplitter
+        // TODO book details section
+
         private DatabaseService _dbService;
         private Book _selectedBook;
 
