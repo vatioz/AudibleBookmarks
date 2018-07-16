@@ -3,9 +3,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <Platforms>AnyCPU;x86;x64</Platforms>
-    <RuntimeIdentifiers>win-x64;win-x86;osx-x64;linux-x64;win10-x64;win10-x86;</RuntimeIdentifiers>
-    <AssemblyName>AudibleBookmarks</AssemblyName>
-    <RootNamespace>AudibleBookmarks.AvaloniaUI</RootNamespace>
+    <RuntimeIdentifiers>win-x64;win-x86;osx-x64;linux-x64;win10-x64;win10-x86;</RuntimeIdentifiers>    
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Models\" />
@@ -21,7 +19,6 @@
     <PackageReference Include="Avalonia" Version="0.6.1" />
     <PackageReference Include="Avalonia.Desktop" Version="0.6.1" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.6.1" />
-    <PackageReference Include="Microsoft.Packaging.Tools.Trimming" Version="1.1.0-preview1-25818-01" />
     <PackageReference Include="StarDebris.Avalonia.MessageBox" Version="0.1.0" />
   </ItemGroup>
   <ItemGroup>

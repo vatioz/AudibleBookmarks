@@ -1,4 +1,4 @@
-﻿$version = "v0.5-alpha"
+﻿$version = "v0.6-alpha"
 $product = "AudibleBookmarks"
 $project = "D:\_sources\AudibleBookmarks\AvaloniaUI\AvaloniaUI.csproj"
 $output = "D:\_sources\AudibleBookmarks\_releases"
@@ -15,7 +15,7 @@ $runtimes = @(
 Remove-Item "$output\*" -Recurse -Confirm:$true
 
 $runtimes | %{
-    & $dotnet publish $project -c release -r $_ /p:TrimUnusedDependencies=true -o ("{0}\{1}" -f $output,$_)
+    & $dotnet publish $project -c release -r $_  -o ("{0}\{1}" -f $output,$_)
 }
 
 $assets = @()
@@ -37,8 +37,8 @@ $runtimes | %{
 
 
 $tmp = Set-GitHubSessionInformation -Username vatioz
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $release = New-GitHubRelease -Repository $product -Name "$product $version" -Tag $version -Asset $assets -Prerelease -Verbose
-
+Write-Information "Path to release: $($release.html_url)"
 # show me
 Start-Process $release.html_url
+
