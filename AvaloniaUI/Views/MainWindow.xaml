@@ -27,34 +27,35 @@
 
   <Window.DataTemplates>
     <DataTemplate DataType="corevm:Book">
-      <Border BorderBrush="Gray" BorderThickness="1" Classes="book" >
+      <Border BorderBrush="Gray" BorderThickness="1" Classes="book"  Margin="0,0,0,-1" Padding="2" >
         <StackPanel  Margin="5" >
           <TextBlock Text="{Binding Title}" Background="{Binding DownloadStatusBackground}" FontWeight="Bold" Margin="0 5" />
           <TextBlock Text="{Binding AuthorLabel}" />
           <TextBlock Text="{Binding NarratorLabel}" />
           <TextBlock Text="{Binding FormattedLength}" />
-          <!--<Separator  Height="2" Background="Gray" Width="50" Margin="5" />-->
         </StackPanel>
       </Border>
     </DataTemplate>
     <DataTemplate DataType="corevm:Bookmark">
+      <Border BorderBrush="Gray" BorderThickness="1" Margin="0,0,0,-1" Padding="5">
       <StackPanel>
         <StackPanel Orientation="Horizontal">
           <TextBlock Text="{Binding Chapter.Title}" FontWeight="Bold" FontSize="14"/>
           <TextBlock Text=" / " FontWeight="Bold"/>
           <TextBlock Text="{Binding PositionChapter, Mode=OneWay}" FontWeight="Normal" />
           <TextBlock Text=" / " FontWeight="Bold"/>
-          <TextBlock Text="{Binding PositionVisualization, Mode=OneWay}" FontWeight="Normal" />
+          <ProgressBar Orientation="Horizontal" Minimum="0" Maximum="100" Value="{Binding PositionChapterPercentage}" />
         </StackPanel>
         <StackPanel Orientation="Horizontal">
           <TextBlock Text="(" />
           <TextBlock Text="{Binding PositionOverall, Mode=OneWay}" FontStyle="Italic" />
           <TextBlock Text=")" />
         </StackPanel>
-        <TextBlock Text="{Binding Title}" />
-        <TextBlock Text="{Binding Note}" FontStyle="Italic" />
-        <Separator  Height="1" Background="Gray" Width="50" Margin="5" HorizontalAlignment="Left" />
+        <TextBlock Text="{Binding Title}" MinHeight="20" />
+        <TextBlock Text="{Binding Note}" MinHeight="20" FontStyle="Italic" />
+        <!--<Separator  Height="1" Background="Gray" Width="50" Margin="5" HorizontalAlignment="Left" />-->
       </StackPanel>
+      </Border>
     </DataTemplate>
     </Window.DataTemplates>
 
