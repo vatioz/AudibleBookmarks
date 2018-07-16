@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace AudibleBookmarks.Core.Models
 {
@@ -19,6 +20,40 @@ namespace AudibleBookmarks.Core.Models
                 var positionInChapter = End - Chapter.StartTime;
                 return TimeSpan.FromTicks(positionInChapter);
             }
+        }
+
+        public int PositionChapterPercentage
+        {
+            get
+            {
+                return GetPositionPercentage(Chapter.Duration, Chapter.StartTime, End);
+            }
+        }
+
+        public static int GetPositionPercentage(long chapterDuration, long chapterStart, long bookmarkPosition)
+        {
+            var positionInChapter = bookmarkPosition - chapterStart;
+            var positionPercentage = positionInChapter * 100 / chapterDuration;
+            return (int)positionPercentage;
+        }
+
+        public string PositionVisualization
+        {
+            get
+            {
+                return GetPositionVisualisation(PositionChapterPercentage);
+            }
+        }
+
+        public static string GetPositionVisualisation(int percentage)
+        {
+            var vis = new StringBuilder("----------");
+            var index = (int)Math.Round(percentage / 10.0, MidpointRounding.AwayFromZero);
+
+            if(index != 0)
+                vis[index - 1] = '*';
+
+            return vis.ToString();
         }
 
         public string PositionChapter => PositionChapterTS.TotalHours > 0

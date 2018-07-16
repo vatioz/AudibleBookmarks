@@ -15,7 +15,7 @@ namespace AvaloniaUI.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase, INotifyPropertyChanged
     {
-
+        // TODO make version sharedbetween code and publish script
         // tODO GridSplitter
         // TODO book details section
 
@@ -213,7 +213,10 @@ namespace AvaloniaUI.ViewModels
 
             var title = bookmark.Title ?? string.Empty;
             var note = bookmark.Note ?? string.Empty;
-            return title.ToUpper().Contains(BookmarkFilterValue.ToUpper()) || note.ToUpper().Contains(BookmarkFilterValue.ToUpper());
+            return title.ToUpper().Contains(BookmarkFilterValue.ToUpper()) || 
+                note.ToUpper().Contains(BookmarkFilterValue.ToUpper()) ||
+                bookmark.PositionVisualization.Contains(BookmarkFilterValue)
+                ;
         }
 
         private string _bookFilterValue;
