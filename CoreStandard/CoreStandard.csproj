@@ -4,7 +4,11 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>AudibleBookmarks.Core</RootNamespace>
     <Platforms>AnyCPU;x86;x64</Platforms>
-    <DebugType>portable</DebugType>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
   <ItemGroup>

@@ -48,8 +48,8 @@ namespace AudibleBookmarks.Core.Services
                 var readerNarrators = commandNarrators.ExecuteReader();
                 while (readerNarrators.Read())
                 {
-                    var asin = (string)readerNarrators["Asin"];
-                    var narrator = (string)readerNarrators["Narrator"];
+                    var asin = GetValue<string>(readerNarrators,"Asin");
+                    var narrator = GetValue<string>(readerNarrators,"Narrator");
                     if (narratorDictionary.ContainsKey(asin))
                         narratorDictionary[asin].Add(narrator);
                     else
@@ -58,7 +58,7 @@ namespace AudibleBookmarks.Core.Services
             }
             catch (Exception ex)
             {
-                PublishException(ex);
+                PublishException(new Exception("Error while loading narrator", ex));
             }
             return narratorDictionary;
         }
@@ -76,8 +76,8 @@ namespace AudibleBookmarks.Core.Services
                 var readerAuthors = commandAuthors.ExecuteReader();
                 while (readerAuthors.Read())
                 {
-                    var asin = (string)readerAuthors["Asin"];
-                    var author = (string)readerAuthors["Author"];
+                    var asin = GetValue<string>(readerAuthors,"Asin");
+                    var author = GetValue<string>(readerAuthors,"Author");
                     if (authorDictionary.ContainsKey(asin))
                         authorDictionary[asin].Add(author);
                     else
@@ -86,7 +86,7 @@ namespace AudibleBookmarks.Core.Services
             }
             catch (Exception ex)
             {
-                PublishException(ex);
+                PublishException(new Exception("Error while loading author", ex));
             }
             return authorDictionary;
         }
@@ -108,7 +108,7 @@ namespace AudibleBookmarks.Core.Services
                 var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    var asin = (string)reader["Asin"];
+                    var asin = GetValue<string>(reader,"Asin");
                     var authors = authorDictionary.ContainsKey(asin)
                         ? authorDictionary[asin]
                         : Enumerable.Empty<string>();
@@ -119,9 +119,9 @@ namespace AudibleBookmarks.Core.Services
                     var book = new Book
                     {
                         Asin = asin,
-                        Title = (string)reader["Title"],
-                        IsDownloaded = (reader["FileName"] as string) != null,
-                        RawLength = (long)reader["Duration"],
+                        Title = GetValue<string>(reader,"Title"),
+                        IsDownloaded = GetValue<string>(reader,"FileName") != null,
+                        RawLength = GetValue<long>(reader,"Duration"),
                         Authors = authors,
                         Narrators = narrators
                     };
@@ -130,7 +130,7 @@ namespace AudibleBookmarks.Core.Services
             }
             catch (Exception ex)
             {
-                PublishException(ex);
+                PublishException(new Exception("Error while loading book", ex));
             }
 
             return books;
@@ -150,9 +150,9 @@ namespace AudibleBookmarks.Core.Services
                 {
                     var ch = new Chapter
                     {
-                        Title = reader["Name"] as string,
-                        Duration = (long)reader["Duration"],
-                        StartTime = (long)reader["StartTime"]
+                        Title = GetValue<string>(reader,"Name"),
+                        Duration = GetValue<long>(reader,"Duration"),
+                        StartTime = GetValue<long>(reader,"StartTime")
                     };
                     selectedBook.Chapters.Add(ch);
                 }
@@ -160,7 +160,7 @@ namespace AudibleBookmarks.Core.Services
             }
             catch (Exception ex)
             {
-                PublishException(ex);
+                PublishException(new Exception("Error while loading chapter", ex));
             }
         }
 
@@ -178,13 +178,13 @@ namespace AudibleBookmarks.Core.Services
                 {
                     try
                     {
-                        var position = (long)reader["Position"];
-                        var startPosition = (long)reader["StartPosition"];
+                        var position = GetValue<long>(reader,"Position");
+                        var startPosition = GetValue<long>(reader,"StartPosition");
                         selectedBook.Bookmarks.Add(new Bookmark
                         {
-                            Note = Sanitize(reader["Note"] as string),
-                            Title = Sanitize(reader["Title"] as string),
-                            Modified = DateTime.Parse((string)reader["LastModifiedTime"]),
+                            Note = Sanitize(GetValue<string>(reader,"Note")),
+                            Title = Sanitize(GetValue<string>(reader,"Title")),
+                            Modified = DateTime.Parse(GetValue<string>(reader,"LastModifiedTime")),
                             End = position,
                             Start = startPosition,
                             Chapter = selectedBook.GetChapter(position)
@@ -198,8 +198,17 @@ namespace AudibleBookmarks.Core.Services
             }
             catch (Exception ex)
             {
-                PublishException(ex);
+                PublishException(new Exception("Error while loading bookmark", ex));
             }
+        }
+
+        private T GetValue<T>(SqliteDataReader reader, string columnName)
+        {
+            var raw = reader[columnName];
+            if (raw is DBNull)
+                return default(T);
+
+            return (T) raw;
         }
 
         private string Sanitize(string str)

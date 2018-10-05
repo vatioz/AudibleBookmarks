@@ -1,4 +1,4 @@
-﻿$version = "v0.6-alpha"
+﻿$version = "v0.8-alpha"
 $product = "AudibleBookmarks"
 $project = "D:\_sources\AudibleBookmarks\AvaloniaUI\AvaloniaUI.csproj"
 $output = "D:\_sources\AudibleBookmarks\_releases"
