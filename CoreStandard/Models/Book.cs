@@ -59,7 +59,11 @@ namespace AudibleBookmarks.Core.Models
 
         public Chapter GetChapter(long position)
         {
-            return Chapters.Last(ch => ch.StartTime < position);
+            var foundChapter = Chapters.LastOrDefault(ch => ch.StartTime < position);
+            if(foundChapter == null)
+                return new Chapter{ Title = "Chapter", StartTime = 0, Duration = RawLength };
+
+            return foundChapter;
         }      
 
 

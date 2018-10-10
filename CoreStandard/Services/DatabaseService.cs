@@ -192,13 +192,13 @@ namespace AudibleBookmarks.Core.Services
                     }
                     catch (Exception ex)
                     {
-                        PublishException(ex);
+                        PublishException(new Exception("Error while loading bookmark", ex));
                     }
                 }
             }
             catch (Exception ex)
             {
-                PublishException(new Exception("Error while loading bookmark", ex));
+                PublishException(new Exception("Error while loading bookmarks", ex));
             }
         }
 

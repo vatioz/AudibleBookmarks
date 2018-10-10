@@ -19,7 +19,7 @@ namespace AudibleBookmarks.Services
 
         public void ShowAlert(Exception ex)
         {
-            MessageBox.Show(ex.Message);
+            MessageBox.Show(ex.InnerException?.Message ?? "Error", ex.Message);
         }
     }
 }
