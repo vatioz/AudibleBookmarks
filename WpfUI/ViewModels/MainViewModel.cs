@@ -18,6 +18,8 @@ using AudibleBookmarks.Core.Services;
 using AudibleBookmarks.Core.Utils;
 using AudibleBookmarks.Services;
 using AudibleBookmarks.Utils;
+using log4net;
+using log4net.Config;
 
 namespace AudibleBookmarks.ViewModels
 {
@@ -30,6 +32,7 @@ namespace AudibleBookmarks.ViewModels
 
         // TODO make template of app of this sort with all the necessary starting points - TinyMessenger, RelayCommand, FileDialogService, MainViewModel, ListBox
 
+        private static ILog _logger = LogManager.GetLogger(typeof(MainViewModel));
 
         private string _pathToLibrary;
         private DatabaseService _dbService;
@@ -46,8 +49,10 @@ namespace AudibleBookmarks.ViewModels
             set
             {
                 _selectedBook = value;
+                _logger.Info($"Book selection changed.");
                 if (_selectedBook != null)
                 {
+                    _logger.Info($"Selected book {_selectedBook}.");
                     LoadChapters(_selectedBook);
                     LoadBookmarks(_selectedBook);
 
@@ -62,6 +67,7 @@ namespace AudibleBookmarks.ViewModels
 
         public MainViewModel()
         {
+            _logger.Info($"Starting AudibleBookmarks {TitleProvider.GetTitleWithVersion()}");
             ISubscribable fileSvc = new FileDialogService();
             fileSvc.StartListening();
             ISubscribable alertSvc = new AlertService();
@@ -118,7 +124,7 @@ namespace AudibleBookmarks.ViewModels
 
         private void ExportExecute()
         {
-            
+            _logger.Info($"ExportExecute()");
             try
             {
                 var sb = BuildExportString();
@@ -126,6 +132,7 @@ namespace AudibleBookmarks.ViewModels
             }
             catch (Exception ex)
             {
+                _logger.Error($"Error exporting bookmarks for {SelectedBook?.Title}. Ex: {ex}");
                 PublishException(ex);
                 return;
             }
@@ -142,8 +149,12 @@ namespace AudibleBookmarks.ViewModels
 
         private StringBuilder BuildExportString()
         {
+            _logger.Info($"Loading bookmark template.");
             var template = File.ReadAllText("BookmarkTemplate.txt");
+            _logger.Info($"Bookmark template loaded: \n{template}");
             var sb = new StringBuilder();
+
+            _logger.Info($"Building text to export for {SelectedBook.Title} from total of {SelectedBook.Bookmarks.Count}");
             foreach (var bookmark in SelectedBook.Bookmarks)
             {
                 if (bookmark.IsEmptyBookmark)
@@ -160,6 +171,7 @@ namespace AudibleBookmarks.ViewModels
                 var populatedTemplate = template.Inject(propDictionary);
                 sb.AppendLine(populatedTemplate);
             }
+            _logger.Info($"Built text is {sb.Length} characters long");
             return sb;
         }
 
@@ -230,9 +242,11 @@ namespace AudibleBookmarks.ViewModels
 
         private void FileOpened(string path)
         {
+            _logger.Info($"Attempting toload DB from file {path}");
+
             if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
                 return;
-
+            
             _dbService.OpenSqliteConnection(path);
             LoadBooks();
         }
@@ -245,11 +259,13 @@ namespace AudibleBookmarks.ViewModels
             {
                 Books.Add(book);
             }
+            _logger.Info($"Loaded {Books.Count} books");
         }
 
         private void LoadChapters(Book selectedBook)
         {
             _dbService.LoadChapters(selectedBook);
+            _logger.Info($"{selectedBook.Title}: Loaded {selectedBook.Chapters.Count} chapters");
         }
 
         private void LoadBookmarks(Book selectedBook)
@@ -262,6 +278,7 @@ namespace AudibleBookmarks.ViewModels
             {
                 Bookmarks.Add(bookmark);
             }
+            _logger.Info($"{selectedBook.Title}: Loaded {selectedBook.Bookmarks.Count} bookmarks");
         }
 
         #endregion

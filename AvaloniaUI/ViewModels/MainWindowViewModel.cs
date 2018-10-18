@@ -18,6 +18,7 @@ namespace AvaloniaUI.ViewModels
         // TODO make version sharedbetween code and publish script
         // tODO GridSplitter
         // TODO book details section
+        // TODO add log4net
 
         private DatabaseService _dbService;
         private BookWrapper _selectedBook;

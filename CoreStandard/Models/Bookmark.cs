@@ -63,5 +63,10 @@ namespace AudibleBookmarks.Core.Models
         public Chapter Chapter { get; set; }
         public DateTime Modified { get; set; }
         public bool IsEmptyBookmark => string.IsNullOrWhiteSpace(Title) && string.IsNullOrWhiteSpace(Note);
+
+        public override string ToString()
+        {
+            return $"Bookmark Title: {Title}, PositionChapter: {PositionChapter}, PositionOverallTS: {PositionOverallTS}";
+        }
     }
 }
