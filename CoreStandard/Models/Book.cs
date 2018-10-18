@@ -64,9 +64,12 @@ namespace AudibleBookmarks.Core.Models
                 return new Chapter{ Title = "Chapter", StartTime = 0, Duration = RawLength };
 
             return foundChapter;
-        }      
+        }
 
-
+        public override string ToString()
+        {
+            return $"Book Asin: {Asin}, Title: {Title}, AuthorLabel: {AuthorLabel}, NarratorLabel: {NarratorLabel}, IsDownloaded: {IsDownloaded}, Length: {FormattedLength}";
+        }
 
 
         public event PropertyChangedEventHandler PropertyChanged;
