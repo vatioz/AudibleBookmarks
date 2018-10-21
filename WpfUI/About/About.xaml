@@ -1,0 +1,122 @@
+﻿<Window x:Class="AudibleBookmarks.About.About"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AudibleBookmarks.About"
+        mc:Ignorable="d"
+        xmlns:custom="clr-namespace:AudibleBookmarks.Utils"
+        ResizeMode="NoResize"
+        ShowInTaskbar="True"        
+        Title="About" Width="400" Height="400">
+    <!--<Window.DataContext>
+        <local:AboutInfo/>
+    </Window.DataContext>-->
+
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0"
+            FontSize="{DynamicResource {x:Static SystemParameters.CaptionHeightKey}}">
+            <TextBlock.Text>
+                <MultiBinding StringFormat="{}{0} v{1}">
+                    <Binding Path="Product" />
+                    <Binding Path="Version" />
+                </MultiBinding>
+            </TextBlock.Text>
+        </TextBlock>
+
+        <TextBlock Grid.Row="1" Grid.Column="0"
+            Text="{Binding Description}" 
+            TextWrapping="Wrap" 
+            FontSize="{DynamicResource {x:Static SystemFonts.StatusFontSizeKey}}" />
+
+        <Image Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" 
+               Source="{Binding Image}" 
+               Height="64" 
+               Width="64">
+            <Image.Resources>
+                <Style TargetType="Image">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Image}" Value="{x:Null}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Resources>
+        </Image>
+
+        <ItemsControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+            ItemsSource="{Binding Links}"
+            Margin="0,5,0,0">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <TextBlock>
+                            <Hyperlink NavigateUri="{Binding Item2, Mode=OneWay}"
+                                       custom:HyperlinkExtensions.IsExternal="true"
+                                       Foreground="Blue"
+                                       >
+                                <Hyperlink.Inlines>
+                                    <Run Text="{Binding Item1, Mode=OneWay}"/>
+                                </Hyperlink.Inlines>
+                            </Hyperlink>
+                        </TextBlock>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <Separator Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+              HorizontalAlignment="Stretch" Height="5"
+              />
+
+        <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
+                   FontStyle="Italic"
+            TextWrapping="Wrap" 
+            MinHeight="0" 
+            Text="{Binding Copy}"
+            FontSize="{DynamicResource {x:Static SystemFonts.StatusFontSizeKey}}" 
+            Margin="0,15,0,0">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Copy}" Value="{x:Null}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+
+        <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
+            Text="License:" 
+            TextDecorations="Underline"                   
+            Margin="0,15,0,2" />
+        <TextBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+            Margin="0"
+            Text="{Binding License}" 
+            TextWrapping="Wrap"
+            FontSize="{DynamicResource {x:Static SystemFonts.StatusFontSizeKey}}" 
+            
+            VerticalScrollBarVisibility="Visible"
+            IsReadOnly="true" />
+
+        
+    </Grid>
+
+</Window>
