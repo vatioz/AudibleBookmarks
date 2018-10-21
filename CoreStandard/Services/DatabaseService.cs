@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using AudibleBookmarks.Core.Messenger;
+﻿using AudibleBookmarks.Core.Messenger;
 using AudibleBookmarks.Core.Models;
 using log4net;
 using log4net.Core;
 using Microsoft.Data.Sqlite;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 
 namespace AudibleBookmarks.Core.Services
 {
@@ -95,8 +95,8 @@ namespace AudibleBookmarks.Core.Services
                 var readerAuthors = commandAuthors.ExecuteReader();
                 while (readerAuthors.Read())
                 {
-                    var asin = GetValue<string>(readerAuthors,"Asin");
-                    var author = GetValue<string>(readerAuthors,"Author");
+                    var asin = GetValue<string>(readerAuthors, "Asin");
+                    var author = GetValue<string>(readerAuthors, "Author");
                     if (authorDictionary.ContainsKey(asin))
                     {
                         authorDictionary[asin].Add(author);
@@ -130,13 +130,13 @@ namespace AudibleBookmarks.Core.Services
             var books = new List<Book>();
             try
             {
-                var sql = "select b.Asin, b.Title, b.Duration, b.FileName from Books b";
+                var sql = "select b.Asin, b.Title, b.Duration, b.DownloadState from Books b";
                 var command = new SqliteCommand(sql, _connection);
                 _logger.Info($"Querying DB with {sql}");
                 var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    var asin = GetValue<string>(reader,"Asin");
+                    var asin = GetValue<string>(reader, "Asin");
                     var authors = authorDictionary.ContainsKey(asin)
                         ? authorDictionary[asin]
                         : Enumerable.Empty<string>();
@@ -147,9 +147,9 @@ namespace AudibleBookmarks.Core.Services
                     var book = new Book
                     {
                         Asin = asin,
-                        Title = GetValue<string>(reader,"Title"),
-                        IsDownloaded = GetValue<string>(reader,"FileName") != null,
-                        RawLength = GetValue<long>(reader,"Duration"),
+                        Title = GetValue<string>(reader, "Title"),
+                        DownloadState = GetValue<long>(reader, "DownloadState"),
+                        RawLength = GetValue<long>(reader, "Duration"),
                         Authors = authors,
                         Narrators = narrators
                     };
@@ -182,9 +182,9 @@ namespace AudibleBookmarks.Core.Services
                 {
                     var ch = new Chapter
                     {
-                        Title = GetValue<string>(reader,"Name"),
-                        Duration = GetValue<long>(reader,"Duration"),
-                        StartTime = GetValue<long>(reader,"StartTime")
+                        Title = GetValue<string>(reader, "Name"),
+                        Duration = GetValue<long>(reader, "Duration"),
+                        StartTime = GetValue<long>(reader, "StartTime")
                     };
                     selectedBook.Chapters.Add(ch);
                     _logger.Debug($"Loaded new chapter for book {selectedBook.Title}: {ch}");
@@ -214,8 +214,8 @@ namespace AudibleBookmarks.Core.Services
                 {
                     try
                     {
-                        var position = GetValue<long>(reader,"Position");
-                        var startPosition = GetValue<long>(reader,"StartPosition");
+                        var position = GetValue<long>(reader, "Position");
+                        var startPosition = GetValue<long>(reader, "StartPosition");
                         var bookmark = new Bookmark
                         {
                             Note = Sanitize(GetValue<string>(reader, "Note")),
@@ -226,7 +226,7 @@ namespace AudibleBookmarks.Core.Services
                             Chapter = selectedBook.GetChapter(position)
                         };
                         selectedBook.Bookmarks.Add(bookmark);
-                        _logger.Debug($"Loaded new bookmark for book {selectedBook.Title.Substring(0,10)} at {bookmark.PositionOverall} (empty: {bookmark.IsEmptyBookmark})");
+                        _logger.Debug($"Loaded new bookmark for book {selectedBook.ShortTitle} at {bookmark.PositionOverall} (empty: {bookmark.IsEmptyBookmark})");
                         _logger.Logger.Log(null, Level.Fine, $"Bookmark details: {bookmark}", null);
                     }
                     catch (Exception ex)
@@ -249,7 +249,7 @@ namespace AudibleBookmarks.Core.Services
             if (raw is DBNull)
                 return default(T);
 
-            return (T) raw;
+            return (T)raw;
         }
 
         private string Sanitize(string str)

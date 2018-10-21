@@ -66,7 +66,7 @@ namespace AudibleBookmarks.Core.Models
 
         public override string ToString()
         {
-            return $"Bookmark Title: {Title}, PositionChapter: {PositionChapter}, PositionOverallTS: {PositionOverallTS}";
+            return $"Bookmark Title: {Title}, Note: {Note}, IsEmpty: {IsEmptyBookmark}, Start: {Start}, End: {End}, Modified: {Modified}, Chapter: {Chapter.Title}, PositionChapter: {PositionChapter}, PositionOverallTS: {PositionOverallTS}";
         }
     }
 }

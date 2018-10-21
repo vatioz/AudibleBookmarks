@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Windows;
-using System.Windows.Data;
-using System.Windows.Input;
+﻿using AudibleBookmarks.About;
 using AudibleBookmarks.Annotations;
 using AudibleBookmarks.Core.Messenger;
 using AudibleBookmarks.Core.Models;
@@ -19,7 +7,17 @@ using AudibleBookmarks.Core.Utils;
 using AudibleBookmarks.Services;
 using AudibleBookmarks.Utils;
 using log4net;
-using log4net.Config;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Input;
 
 namespace AudibleBookmarks.ViewModels
 {
@@ -35,6 +33,16 @@ namespace AudibleBookmarks.ViewModels
         private static ILog _logger = LogManager.GetLogger(typeof(MainViewModel));
 
         private string _pathToLibrary;
+        public string PathToLibrary
+        {
+            get { return _pathToLibrary; }
+            set
+            {
+                _pathToLibrary = value;
+                OnPropertyChanged();
+            }
+        }
+
         private DatabaseService _dbService;
         private Book _selectedBook;
 
@@ -50,12 +58,11 @@ namespace AudibleBookmarks.ViewModels
             {
                 _selectedBook = value;
                 _logger.Info($"Book selection changed.");
-                if (_selectedBook != null)
+                if (_selectedBook != null && _selectedBook.IsDownloaded)
                 {
                     _logger.Info($"Selected book {_selectedBook}.");
                     LoadChapters(_selectedBook);
                     LoadBookmarks(_selectedBook);
-
                 }
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(TotalBookmarkCount));
@@ -102,6 +109,16 @@ namespace AudibleBookmarks.ViewModels
 
         #region | Commands
 
+        public ICommand About => new RelayCommand(()=> true, AboutExecute);
+
+        private void AboutExecute()
+        {
+            About.About about = new About.About();
+            about.DataContext = new AboutInfo();
+            about.ShowDialog();
+            //AboutDialog.ShowWindow(new AboutInfo());
+        }
+
         public ICommand LoadAudibleLibrary { get { return new RelayCommand(CanLoadAudibleLibraryExecute, LoadAudibleLibraryExecute); } }
 
         private bool CanLoadAudibleLibraryExecute()
@@ -113,6 +130,19 @@ namespace AudibleBookmarks.ViewModels
         {
             TinyMessengerHub.Instance.Publish(new OpenFileMessage(this, FileOpened));
 
+        }
+
+        private void FileOpened(string path)
+        {
+            PathToLibrary = path;
+
+            _logger.Info($"Attempting toload DB from file {path}");
+
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+                return;
+
+            _dbService.OpenSqliteConnection(path);
+            LoadBooks();
         }
 
         public ICommand Export { get { return new RelayCommand(CanExportExecute, ExportExecute); } }
@@ -240,16 +270,7 @@ namespace AudibleBookmarks.ViewModels
 
         #region | Refresh stuff on book selection
 
-        private void FileOpened(string path)
-        {
-            _logger.Info($"Attempting toload DB from file {path}");
-
-            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
-                return;
-            
-            _dbService.OpenSqliteConnection(path);
-            LoadBooks();
-        }
+        
 
         private void LoadBooks()
         {
